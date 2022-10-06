@@ -4,6 +4,7 @@ from views import get_all_animals, get_single_animal, get_all_locations, get_sin
 from views import get_all_employees, get_single_employee, get_all_customers, get_single_customer
 from views import create_animal, create_location, create_employee, create_customer
 from views import delete_animal, delete_location, delete_employee, delete_customer
+from views import update_animal, update_location, update_employee, update_customer
 
 # Here's a class. It inherits from another class.
 # For now, think of a class as a container for functions that
@@ -138,6 +139,27 @@ class HandleRequests(BaseHTTPRequestHandler):
             update_animal(id, post_body)
 
         # Encode the new animal and send in response
+        self.wfile.write("".encode())
+        
+        # Delete a single location from the list
+        if resource == "locations":
+            update_location(id, post_body)
+
+        # Encode the new location and send in response
+        self.wfile.write("".encode())
+        
+        # Delete a single employee from the list
+        if resource == "employees":
+            update_employee(id, post_body)
+
+        # Encode the new employee and send in response
+        self.wfile.write("".encode())
+        
+        # Delete a single customer from the list
+        if resource == "customers":
+            update_customer(id, post_body)
+
+        # Encode the new customer and send in response
         self.wfile.write("".encode())
 
     def _set_headers(self, status):
