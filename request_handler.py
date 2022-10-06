@@ -93,36 +93,22 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
         # Initialize new animal
-        new_animal = None
-        new_location = None
-        new_employee = None
+        new_item = None
 
         # Add a new animal to the list. Don't worry about
         # the orange squiggle, you'll define the create_animal
         # function next.
         if resource == "animals":
-            new_animal = create_animal(post_body)
+            new_item = create_animal(post_body)
+        elif resource == "locations":
+            new_item = create_location(post_body)
+        elif resource == "employees":
+            new_item = create_employee(post_body)
+        elif resource == "customers":
+            new_item = create_customer(post_body)
 
         # Encode the new animal and send in response
-        self.wfile.write(json.dumps(new_animal).encode())
-        
-        if resource == "locations":
-            new_location = create_location(post_body)
-
-        # Encode the new location and send in response
-        self.wfile.write(json.dumps(new_location).encode())
-        
-        if resource == "employees":
-            new_employee = create_employee(post_body)
-
-        # Encode the new employee and send in response
-        self.wfile.write(json.dumps(new_employee).encode())
-        
-        if resource == "customers":
-            new_customer = create_customer(post_body)
-
-        # Encode the new customer and send in response
-        self.wfile.write(json.dumps(new_customer).encode())
+        self.wfile.write(json.dumps(new_item).encode())
 
     # A method that handles any PUT request.
     def do_PUT(self):
