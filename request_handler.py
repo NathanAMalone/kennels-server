@@ -43,9 +43,9 @@ class HandleRequests(BaseHTTPRequestHandler):
     def do_GET(self):
         """Handles GET requests to the server
         """
-        # Set the response code to 'Ok'
-        self._set_headers(200)
         response = {}  # Default response
+        # Set the response code to 'Ok'
+
 
         # Parse the URL and capture the tuple that is returned
         (resource, id) = self.parse_url(self.path)
@@ -76,6 +76,14 @@ class HandleRequests(BaseHTTPRequestHandler):
             else:
                 response = get_all_customers()
         # Send a JSON formatted string as a response
+
+        # Moved to bottom so header is set after data retrieval attempted
+        if response is not None:
+            self._set_headers(200)
+        else:
+            self._set_headers(404)
+            response = f'Animal {id} is out playing right now.'
+
         self.wfile.write(json.dumps(response).encode())
 
 
