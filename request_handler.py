@@ -90,7 +90,6 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Here's a method on the class that overrides the parent's method.
     # It handles any POST request.
     def do_POST(self):
-        self._set_headers(201)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
@@ -107,13 +106,43 @@ class HandleRequests(BaseHTTPRequestHandler):
         # the orange squiggle, you'll define the create_animal
         # function next.
         if resource == "animals":
-            new_item = create_animal(post_body)
+            if "name" in post_body and "species" in post_body and "locationId" in post_body and "customerId" in post_body and "status" in post_body:
+                self._set_headers(201)
+                new_item = create_animal(post_body)
+            else:
+                self._set_headers(400)
+                new_item = { 
+                    "message": f'{"name is required" if "name" not in post_body else ""} {"species is required" if "species" not in post_body else ""}\
+                    {"locationId is required" if "locationId" not in post_body else ""} {"customerId is required" if "customerId" not in post_body else ""}\
+                    {"status is required" if "status" not in post_body else ""}'
+                }
         elif resource == "locations":
-            new_item = create_location(post_body)
+            if "name" in post_body and "address" in post_body:
+                self._set_headers(201)
+                new_item = create_location(post_body)
+            else:
+                self._set_headers(400)
+                new_item = { 
+                    "message": f'{"name is required" if "name" not in post_body else ""} {"address is required" if "address" not in post_body else ""}'
+                }
         elif resource == "employees":
-            new_item = create_employee(post_body)
+            if "name" in post_body:
+                self._set_headers(201)
+                new_item = create_employee(post_body)
+            else:
+                self._set_headers(400)
+                new_item = { 
+                    "message": f'{"name is required" if "name" not in post_body else ""}'
+                }
         elif resource == "customers":
-            new_item = create_customer(post_body)
+            if "name" in post_body:
+                self._set_headers(201)
+                new_item = create_customer(post_body)
+            else:
+                self._set_headers(400)
+                new_item = { 
+                    "message": f'{"name is required" if "name" not in post_body else ""}'
+                }
 
         # Encode the new animal and send in response
         self.wfile.write(json.dumps(new_item).encode())
@@ -180,14 +209,13 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_DELETE(self):
-    # Set a 204 response code
-        self._set_headers(204)
-
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
     # Delete a single animal from the list
         if resource == "animals":
+        # Set a 204 response code
+            self._set_headers(204)
             delete_animal(id)
 
     # Encode the new animal and send in response
@@ -195,6 +223,8 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     # Delete a single location from the list
         if resource == "locations":
+        # Set a 204 response code
+            self._set_headers(204)
             delete_location(id)
 
     # Encode the new location and send in response
@@ -202,6 +232,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         
     # Delete a single employee from the list
         if resource == "employees":
+        # Set a 204 response code
+            self._set_headers(204)
             delete_employee(id)
 
     # Encode the new employee and send in response
@@ -209,10 +241,14 @@ class HandleRequests(BaseHTTPRequestHandler):
     
     # Delete a single customer from the list
         if resource == "customers":
-            delete_customer(id)
+        # Set a 204 response code
+            self._set_headers(405)
+            message = {
+                "message": f'{"Deletion of customer data is not allowed"}'
+            }
 
     # Encode the new customer and send in response
-        self.wfile.write("".encode())
+        self.wfile.write(json.dumps(message).encode())
 
 # This function is not inside the class. It is the starting
 # point of this application.
