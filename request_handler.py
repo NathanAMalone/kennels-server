@@ -63,27 +63,24 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = f'Animal {id} is out playing right now.'
 
         if resource == "locations":
+            self._set_headers(200)
             if id is not None:
-                self._set_headers(200)
                 response = get_single_location(id)
             else:
-                self._set_headers(200)
                 response = get_all_locations()
                 
         if resource == "employees":
+            self._set_headers(200)
             if id is not None:
-                self._set_headers(200)
                 response = get_single_employee(id)
             else:
-                self._set_headers(200)
                 response = get_all_employees()
                 
         if resource == "customers":
+            self._set_headers(200)
             if id is not None:
-                self._set_headers(200)
                 response = get_single_customer(id)
             else:
-                self._set_headers(200)
                 response = get_all_customers()
         # Send a JSON formatted string as a response
 
