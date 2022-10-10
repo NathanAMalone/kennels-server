@@ -54,35 +54,38 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "animals":
             if id is not None:
                 response = get_single_animal(id)
-
             else:
                 response = get_all_animals()
+            if response is not None:
+                self._set_headers(200)
+            else:
+                self._set_headers(404)
+                response = f'Animal {id} is out playing right now.'
 
         if resource == "locations":
             if id is not None:
+                self._set_headers(200)
                 response = get_single_location(id)
             else:
+                self._set_headers(200)
                 response = get_all_locations()
                 
         if resource == "employees":
             if id is not None:
+                self._set_headers(200)
                 response = get_single_employee(id)
             else:
+                self._set_headers(200)
                 response = get_all_employees()
                 
         if resource == "customers":
             if id is not None:
+                self._set_headers(200)
                 response = get_single_customer(id)
             else:
+                self._set_headers(200)
                 response = get_all_customers()
         # Send a JSON formatted string as a response
-
-        # Moved to bottom so header is set after data retrieval attempted
-        if response is not None:
-            self._set_headers(200)
-        else:
-            self._set_headers(404)
-            response = f'Animal {id} is out playing right now.'
 
         self.wfile.write(json.dumps(response).encode())
 
