@@ -10,7 +10,42 @@ from views import update_animal, update_location, update_employee, update_custom
 # For now, think of a class as a container for functions that
 # work together for a common purpose. In this case, that
 # common purpose is to respond to HTTP requests from a client.
+# Default response
+method_mapper = {
+    "animals": {
+        "single": get_single_animal,
+        "all": get_all_animals
+    },
+    "locations": {
+        "single": get_single_location,
+        "all": get_all_locations
+    },
+    "employees": {
+        "single": get_single_employee,
+        "all": get_all_employees
+    },
+    "customers": {
+        "single": get_single_customer,
+        "all": get_all_customers
+    }
+}
+
 class HandleRequests(BaseHTTPRequestHandler):
+    
+    def get_all_or_single(self, resource, id):
+        if id is not None:
+            response = method_mapper[resource]["single"](id)
+
+            if response is not None:
+                self._set_headers(200)
+            else:
+                self._set_headers(404)
+                response = { "message": f'Sorry, there are no {resource} with an id of {id}. '}
+        else:
+            self._set_headers(200)
+            response = method_mapper[resource]["all"]()
+
+        return response
     # This is a Docstring it should be at the beginning of all classes and functions
     # It gives a description of the class or function
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -43,46 +78,48 @@ class HandleRequests(BaseHTTPRequestHandler):
     def do_GET(self):
         """Handles GET requests to the server
         """
-        response = {}  # Default response
         # Set the response code to 'Ok'
-
+        response = {}  
 
         # Parse the URL and capture the tuple that is returned
         (resource, id) = self.parse_url(self.path)
 
-        # It's an if..else statement
-        if resource == "animals":
-            if id is not None:
-                response = get_single_animal(id)
-            else:
-                response = get_all_animals()
-            if response is not None:
-                self._set_headers(200)
-            else:
-                self._set_headers(404)
-                response = f'Animal {id} is out playing right now.'
+        #line 88 along with 35-48 and method_mapper replaces 90-122
+        response = self.get_all_or_single(resource, id)
 
-        if resource == "locations":
-            self._set_headers(200)
-            if id is not None:
-                response = get_single_location(id)
-            else:
-                response = get_all_locations()
+        # # It's an if..else statement
+        # if resource == "animals":
+        #     if id is not None:
+        #         response = get_single_animal(id)
+        #     else:
+        #         response = get_all_animals()
+        #     if response is not None:
+        #         self._set_headers(200)
+        #     else:
+        #         self._set_headers(404)
+        #         response = f'Animal {id} is out playing right now.'
+
+        # if resource == "locations":
+        #     self._set_headers(200)
+        #     if id is not None:
+        #         response = get_single_location(id)
+        #     else:
+        #         response = get_all_locations()
                 
-        if resource == "employees":
-            self._set_headers(200)
-            if id is not None:
-                response = get_single_employee(id)
-            else:
-                response = get_all_employees()
+        # if resource == "employees":
+        #     self._set_headers(200)
+        #     if id is not None:
+        #         response = get_single_employee(id)
+        #     else:
+        #         response = get_all_employees()
                 
-        if resource == "customers":
-            self._set_headers(200)
-            if id is not None:
-                response = get_single_customer(id)
-            else:
-                response = get_all_customers()
-        # Send a JSON formatted string as a response
+        # if resource == "customers":
+        #     self._set_headers(200)
+        #     if id is not None:
+        #         response = get_single_customer(id)
+        #     else:
+        #         response = get_all_customers()
+        # # Send a JSON formatted string as a response
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -112,9 +149,9 @@ class HandleRequests(BaseHTTPRequestHandler):
             else:
                 self._set_headers(400)
                 new_item = { 
-                    "message": f'{"name is required" if "name" not in post_body else ""} {"species is required" if "species" not in post_body else ""}\
-                    {"locationId is required" if "locationId" not in post_body else ""} {"customerId is required" if "customerId" not in post_body else ""}\
-                    {"status is required" if "status" not in post_body else ""}'
+                    "message": f'{"name is required" if "name" not in post_body else ""}' f'{"species is required" if "species" not in post_body else ""}'\
+                    f'{"locationId is required" if "locationId" not in post_body else ""}' f'{"customerId is required" if "customerId" not in post_body else ""}'\
+                    f'{"status is required" if "status" not in post_body else ""}'
                 }
         elif resource == "locations":
             if "name" in post_body and "address" in post_body:
