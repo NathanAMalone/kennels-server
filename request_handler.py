@@ -40,7 +40,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 self._set_headers(200)
             else:
                 self._set_headers(404)
-                response = { "message": f'Sorry, there are no {resource} with an id of {id}. '}
+                response = { "message": f'Sorry, there are no {resource} with an id of {id}.' }
         else:
             self._set_headers(200)
             response = method_mapper[resource]["all"]()

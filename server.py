@@ -99,8 +99,6 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Here's a method on the class that overrides the parent's method.
     # It handles any POST request.
 
-    # def post_create(self, post_body, resource)
-
     def do_POST(self):
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
@@ -135,7 +133,7 @@ class HandleRequests(BaseHTTPRequestHandler):
             else:
                 self._set_headers(400)
                 new_item = { 
-                    "message": f'{"name is required" if "name" not in post_body else ""} {"address is required" if "address" not in post_body else ""}'
+                    "message": f'{"name is required" if "name" not in post_body else ""}' f'{"address is required" if "address" not in post_body else ""}'
                 }
         elif resource == "employees":
             if "name" in post_body:
