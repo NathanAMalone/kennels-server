@@ -1,7 +1,3 @@
-from ctypes import addressof
-import email
-
-
 class Customer():
 
     # Class initializer. It has 1 custom parameters, with the

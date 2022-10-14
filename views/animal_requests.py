@@ -151,7 +151,7 @@ def get_single_animal(id):
                             data['status'], data['location_id'],
                             data['customer_id'])
 
-        return animal.__dict__
+    return animal.__dict__
 
 # def create_animal(animal):
 #     # Get the id value of the last animal in the list
