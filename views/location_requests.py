@@ -29,10 +29,10 @@ def get_all_locations():
         # Write the SQL query to get the information you want
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.name,
-            a.address
-        FROM location a
+            l.id,
+            l.name,
+            l.address
+        FROM location l
         """)
 
         # Initialize an empty list to hold all location representations
@@ -70,11 +70,11 @@ def get_single_location(id):
         # into the SQL statement.
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.name,
-            a.address
-        FROM location a
-        WHERE a.id = ?
+            l.id,
+            l.name,
+            l.address
+        FROM location l
+        WHERE l.id = ?
         """, ( id, ))
 
         # Load the single result into memory
@@ -116,11 +116,39 @@ def delete_location(id):
     if location_index >= 0:
         LOCATIONS.pop(location_index)
 
+# def update_location(id, new_location):
+#     # Iterate the LOCATIONS list, but use enumerate() so that
+#     # you can access the index value of each item.
+#     for index, location in enumerate(LOCATIONS):
+#         if location["id"] == id:
+#             # Found the location. Update the value.
+#             LOCATIONS[index] = new_location
+#             break
+
 def update_location(id, new_location):
-    # Iterate the LOCATIONS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, location in enumerate(LOCATIONS):
-        if location["id"] == id:
-            # Found the location. Update the value.
-            LOCATIONS[index] = new_location
-            break
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Location
+            SET
+                name = ?,
+                breed = ?,
+                status = ?,
+                location_id = ?,
+                customer_id = ?
+        WHERE id = ?
+        """, (new_location['name'], new_location['breed'],
+              new_location['status'], new_location['locationId'],
+              new_location['customerId'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True

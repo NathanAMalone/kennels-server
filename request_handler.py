@@ -111,24 +111,24 @@ class HandleRequests(BaseHTTPRequestHandler):
 
             if resource == "animals":
                 if id is not None:
-                    response = f"{get_single_animal(id)}"
+                    response = get_single_animal(id)
                 else:
-                    response = f"{get_all_animals()}"
+                    response = get_all_animals()
             elif resource == "customers":
                 if id is not None:
-                    response = f"{get_single_customer(id)}"
+                    response = get_single_customer(id)
                 else:
-                    response = f"{get_all_customers()}"
+                    response = get_all_customers()
             elif resource == "employees":
                 if id is not None:
-                    response = f"{get_single_employee(id)}"
+                    response = get_single_employee(id)
                 else:
-                    response = f"{get_all_employees()}"
+                    response = get_all_employees()
             elif resource == "locations":
                 if id is not None:
-                    response = f"{get_single_location(id)}"
+                    response = get_single_location(id)
                 else:
-                    response = f"{get_all_locations()}"
+                    response = get_all_locations()
 
         else: # There is a ? in the path, run the query param functions
             (resource, query) = parsed
@@ -206,20 +206,21 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Initialize new animal
+        #
+        #  Initialize new animal
         new_item = None
 
         # Add a new animal to the list. Don't worry about
         # the orange squiggle, you'll define the create_animal
         # function next.
         if resource == "animals":
-            if "name" in post_body and "species" in post_body and "locationId" in post_body and "customerId" in post_body and "status" in post_body:
+            if "name" in post_body and "breed" in post_body and "locationId" in post_body and "customerId" in post_body and "status" in post_body:
                 self._set_headers(201)
                 new_item = create_animal(post_body)
             else:
                 self._set_headers(400)
                 new_item = { 
-                    "message": f'{"name is required" if "name" not in post_body else ""}' f'{"species is required" if "species" not in post_body else ""}'\
+                    "message": f'{"name is required" if "name" not in post_body else ""}' f'{"breed is required" if "breed" not in post_body else ""}'\
                     f'{"locationId is required" if "locationId" not in post_body else ""}' f'{"customerId is required" if "customerId" not in post_body else ""}'\
                     f'{"status is required" if "status" not in post_body else ""}'
                 }
@@ -256,7 +257,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     # A method that handles any PUT request.
     def do_PUT(self):
-        self._set_headers(204)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
@@ -264,33 +264,61 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Delete a single animal from the list
+        success = False
+
         if resource == "animals":
-            update_animal(id, post_body)
+            success = update_animal(id, post_body)
+        # rest of the elif's
+        elif resource == "customers":
+            success = update_customer(id, post_body)
+        elif resource == "employees":
+            success = update_employee(id, post_body)
+        elif resource == "locations":
+            success = update_location(id, post_body)
 
-        # Encode the new animal and send in response
+        if success:
+            self._set_headers(204)
+        else:
+            self._set_headers(404)
+
         self.wfile.write("".encode())
+
+    # def do_PUT(self):
+    #     self._set_headers(204)
+    #     content_len = int(self.headers.get('content-length', 0))
+    #     post_body = self.rfile.read(content_len)
+    #     post_body = json.loads(post_body)
+
+    #     # Parse the URL
+    #     (resource, id) = self.parse_url(self.path)
+
+    #     # Delete a single animal from the list
+    #     if resource == "animals":
+    #         update_animal(id, post_body)
+
+    #     # Encode the new animal and send in response
+    #     self.wfile.write("".encode())
         
-        # Delete a single location from the list
-        if resource == "locations":
-            update_location(id, post_body)
+    #     # Delete a single location from the list
+    #     if resource == "locations":
+    #         update_location(id, post_body)
 
-        # Encode the new location and send in response
-        self.wfile.write("".encode())
+    #     # Encode the new location and send in response
+    #     self.wfile.write("".encode())
         
-        # Delete a single employee from the list
-        if resource == "employees":
-            update_employee(id, post_body)
+    #     # Delete a single employee from the list
+    #     if resource == "employees":
+    #         update_employee(id, post_body)
 
-        # Encode the new employee and send in response
-        self.wfile.write("".encode())
+    #     # Encode the new employee and send in response
+    #     self.wfile.write("".encode())
         
-        # Delete a single customer from the list
-        if resource == "customers":
-            update_customer(id, post_body)
+    #     # Delete a single customer from the list
+    #     if resource == "customers":
+    #         update_customer(id, post_body)
 
-        # Encode the new customer and send in response
-        self.wfile.write("".encode())
+    #     # Encode the new customer and send in response
+    #     self.wfile.write("".encode())
 
     def _set_headers(self, status):
         # Notice this Docstring also includes information about the arguments passed to the function

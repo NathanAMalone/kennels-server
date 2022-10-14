@@ -24,15 +24,15 @@ def get_all_customers():
         # Write the SQL query to get the information you want
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.name,
-            a.address,
-            a.email,
-            a.password
-        FROM customer a
+            c.id,
+            c.name,
+            c.address,
+            c.email,
+            c.password
+        FROM customer c
         """)
 
-        # Initialize an empty list to hold all animal representations
+        # Initialize an empty list to hold all customer representations
         customers = []
 
         # Convert rows of data into a Python list
@@ -41,10 +41,10 @@ def get_all_customers():
         # Iterate list of data returned from database
         for row in dataset:
 
-            # Create an animal instance from the current row.
+            # Create an customer instance from the current row.
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
-            # Animal class above.
+            # Customer class above.
             customer = Customer(row['id'], row['name'], row['address'],
                                     row['email'], row['password'])
 
@@ -68,13 +68,13 @@ def get_single_customer(id):
         # into the SQL statement.
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.name,
-            a.address,
-            a.email,
-            a.password
-        FROM customer a
-        WHERE a.id = ?
+            c.id,
+            c.name,
+            c.address,
+            c.email,
+            c.password
+        FROM customer c
+        WHERE c.id = ?
         """, ( id, ))
 
         # Load the single result into memory
@@ -117,14 +117,42 @@ def delete_customer(id):
     if customer_index >= 0:
         CUSTOMERS.pop(customer_index)
 
+# def update_customer(id, new_customer):
+#     # Iterate the CUSTOMERS list, but use enumerate() so that
+#     # you can access the index value of each item.
+#     for index, customer in enumerate(CUSTOMERS):
+#         if customer["id"] == id:
+#             # Found the customer. Update the value.
+#             CUSTOMERS[index] = new_customer
+#             break
+
 def update_customer(id, new_customer):
-    # Iterate the CUSTOMERS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, customer in enumerate(CUSTOMERS):
-        if customer["id"] == id:
-            # Found the customer. Update the value.
-            CUSTOMERS[index] = new_customer
-            break
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Customer
+            SET
+                name = ?,
+                breed = ?,
+                status = ?,
+                location_id = ?,
+                customer_id = ?
+        WHERE id = ?
+        """, (new_customer['name'], new_customer['breed'],
+              new_customer['status'], new_customer['locationId'],
+              new_customer['customerId'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True
 
 def get_customers_by_email(email):
 
