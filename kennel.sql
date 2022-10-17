@@ -33,6 +33,8 @@ CREATE TABLE `Employee` (
 
 );
 
+DELETE FROM animal where id = 11 OR id = 12
+
 INSERT INTO `Location` VALUES (null, 'Nashville North', "64 Washington Heights");
 INSERT INTO `Location` VALUES (null, 'Nashville South', "101 Penn Ave");
 
@@ -80,3 +82,37 @@ JOIN Location l
 SELECT * FROM Animal ORDER BY id DESC;
 
 SELECT * FROM Employee ORDER BY id DESC;
+
+SELECT
+	a.id,
+	a.name,
+	a.breed,
+	a.status,
+	a.location_id,
+	a.customer_id,
+	l.name location_name,
+	l.address location_address,
+	c.name customer_name,
+	c.address customer_address,
+	c.email customer_email
+FROM Animal a
+JOIN Location l
+	ON l.id = a.location_id
+JOIN Customer c
+	ON c.id = a.customer_id
+WHERE a.status = "Treatment"
+
+SELECT 
+	l.id,
+	l.name,
+	COUNT(a.location_id) animals,
+	l.address
+FROM location l
+JOIN Animal a
+	ON a.location_id = l.id
+GROUP BY a.location_id
+
+SELECT COUNT(location_id)
+FROM Animal
+WHERE location_id=1
+

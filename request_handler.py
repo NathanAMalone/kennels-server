@@ -54,22 +54,42 @@ class HandleRequests(BaseHTTPRequestHandler):
     """
 
      # replace the parse_url function in the class
-    def parse_url(self, path):
-        """Parse the url into the resource and id"""
-        parsed_url = urlparse(path)
-        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
-        resource = path_params[1]
+    def parse_url(self, path): #this is for explorer chapters, book 2
+        url_components = urlparse(path)
+        path_params = url_components.path.strip("/").split("/")
+        query_params = []
 
-        if parsed_url.query:
-            query = parse_qs(parsed_url.query)
-            return (resource, query)
+        if url_components.query != '':
+            query_params = url_components.query.split("&")
 
-        pk = None
+        resource = path_params[0]
+        id = None
+
         try:
-            pk = int(path_params[2])
-        except (IndexError, ValueError):
-            pass
-        return (resource, pk)
+            id = int(path_params[1])
+        except IndexError:
+            pass  # No route parameter exists: /animals
+        except ValueError:
+            pass  # Request had trailing slash: /animals/
+
+        return (resource, id, query_params)
+
+    # def parse_url(self, path): #pre explorer chapters book 2
+    #     """Parse the url into the resource and id"""
+    #     parsed_url = urlparse(path)
+    #     path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
+    #     resource = path_params[1]
+
+    #     if parsed_url.query:
+    #         query = parse_qs(parsed_url.query)
+    #         return (resource, query)
+
+    #     pk = None
+    #     try:
+    #         pk = int(path_params[2])
+    #     except (IndexError, ValueError):
+    #         pass
+    #     return (resource, pk)
 
     # def parse_url(self, path):
     #     # Just like splitting a string in JavaScript. If the
@@ -106,42 +126,41 @@ class HandleRequests(BaseHTTPRequestHandler):
         parsed = self.parse_url(self.path)
 
         # If the path does not include a query parameter, continue with the original if block
-        if '?' not in self.path:
-            ( resource, id ) = parsed
+        (resource, id, query_params) = parsed
 
-            if resource == "animals":
-                if id is not None:
-                    response = get_single_animal(id)
-                else:
-                    response = get_all_animals()
-            elif resource == "customers":
-                if id is not None:
-                    response = get_single_customer(id)
-                else:
-                    response = get_all_customers()
-            elif resource == "employees":
-                if id is not None:
-                    response = get_single_employee(id)
-                else:
-                    response = get_all_employees()
-            elif resource == "locations":
-                if id is not None:
-                    response = get_single_location(id)
-                else:
-                    response = get_all_locations()
+        # if '?' not in self.path:
+        if resource == "animals":
+            if id is not None:
+                response = get_single_animal(id)
+            else:
+                response = get_all_animals(query_params)
+        elif resource == "customers":
+            if id is not None:
+                response = get_single_customer(id)
+            else:
+                response = get_all_customers()
+        elif resource == "employees":
+            if id is not None:
+                response = get_single_employee(id)
+            else:
+                response = get_all_employees()
+        elif resource == "locations":
+            if id is not None:
+                response = get_single_location(id)
+            else:
+                response = get_all_locations()
 
-        else: # There is a ? in the path, run the query param functions
-            (resource, query) = parsed
-
-            # see if the query dictionary has an email key
-            if query.get('email') and resource == 'customers':
-                response = get_customers_by_email(query['email'][0])
-            elif query.get('location_id') and resource == 'animals':
-                response = get_animals_by_location(query['location_id'][0])
-            elif query.get('location_id') and resource == 'employees':
-                response = get_employees_by_location(query['location_id'][0])
-            elif query.get('status') and resource == 'animals':
-                response = get_animals_by_status(query['status'][0])
+        # else: # There is a ? in the path, run the query param functions
+            
+        #     # see if the query dictionary has an email key
+        #     if query_params.get('email') and resource == 'customers':
+        #         response = get_customers_by_email(query_params['email'][0])
+        #     elif query_params.get('location_id') and resource == 'animals':
+        #         response = get_animals_by_location(query_params['location_id'][0])
+        #     elif query_params.get('location_id') and resource == 'employees':
+        #         response = get_employees_by_location(query_params['location_id'][0])
+        #     elif query_params.get('status') and resource == 'animals':
+        #         response = get_animals_by_status(query_params['status'][0])
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -204,7 +223,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         #
         #  Initialize new animal
@@ -262,7 +281,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
 
         # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
         success = False
 
@@ -345,7 +364,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_DELETE(self):
     # Parse the URL
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
 
     # Delete a single animal from the list
         if resource == "animals":
