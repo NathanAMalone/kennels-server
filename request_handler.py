@@ -99,7 +99,7 @@ class HandleRequests(BaseHTTPRequestHandler):
     #     path_params = path.split("/")
     #     resource = path_params[1]
     #     id = None
-
+    
     #     # Try to get the item at index 2
     #     try:
     #         # Convert the string "1" to the integer 1
