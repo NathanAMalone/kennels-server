@@ -33,7 +33,32 @@ CREATE TABLE `Employee` (
 
 );
 
-DELETE FROM animal where id = 11 OR id = 12
+CREATE TABLE `Duties` (
+	`id` 	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	`name`	TEXT NOT NULL
+);
+
+CREATE TABLE `Assignments` (
+	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	`employee_id`	INTEGER NOT NULL,
+	`animal_id`		INTEGER NOT NULL,
+	`duties_id`		INTEGER NOT NULL
+);
+
+
+INSERT INTO `Duties` VALUES (null, 'Recreation');
+INSERT INTO `Duties` VALUES (null, 'Treatment');
+INSERT INTO `Duties` VALUES (null, 'Kennel');
+
+INSERT INTO `Assignments` VALUES (null, 1, 1, 1);
+INSERT INTO `Assignments` VALUES (null, 2, 1, 3);
+INSERT INTO `Assignments` VALUES (null, 3, 3, 2);
+INSERT INTO `Assignments` VALUES (null, 4, 4, 3);
+INSERT INTO `Assignments` VALUES (null, 5, 6, 3);
+INSERT INTO `Assignments` VALUES (null, 6, 13, 1);
+INSERT INTO `Assignments` VALUES (null, 1, 14, 1);
+INSERT INTO `Assignments` VALUES (null, 2, 13, 3);
+INSERT INTO `Assignments` VALUES (null, 3, 9, 3);
 
 INSERT INTO `Location` VALUES (null, 'Nashville North', "64 Washington Heights");
 INSERT INTO `Location` VALUES (null, 'Nashville South', "101 Penn Ave");
@@ -61,6 +86,52 @@ INSERT INTO `Animal` VALUES (null, "Daps", "Kennel", "Boxer", 2, 2);
 INSERT INTO `Animal` VALUES (null, "Cleo", "Kennel", "Poodle", 2, 2);
 INSERT INTO `Animal` VALUES (null, "Popcorn", "Kennel", "Beagle", 3, 2);
 INSERT INTO `Animal` VALUES (null, "Curly", "Treatment", "Poodle", 4, 2);
+
+
+SELECT
+	e.id,
+	e.name,
+	e.address,
+	e.location_id,
+	an.name animal_name,
+	d.name duty_name
+FROM Employee e
+JOIN Assignments a
+	ON a.employee_id = e.id
+JOIN Duties d
+	ON d.id = a.duties_id
+LEFT JOIN Animal	an
+	ON an.id = a.animal_id
+WHERE e.id = 1
+GROUP BY an.name
+
+SELECT
+	e.id,
+	e.name,
+	e.address,
+    e.location_id,
+	an.name animal_name,
+	d.name duty_name
+FROM Employee e
+JOIN Assignments a
+	ON a.employee_id = e.id
+JOIN Duties d
+	ON d.id = a.duties_id
+LEFT JOIN Animal	an
+	ON an.id = a.animal_id
+WHERE e.id = 1
+ORDER BY e.name
+
+SELECT
+	*
+FROM Employee e
+JOIN Assignments a
+	ON a.employee_id = e.id
+JOIN Duties d
+	ON d.id = a.duties_id
+LEFT JOIN Animal	an
+	ON an.id = a.animal_id
+ORDER BY e.name
 
 SELECT * FROM animal
 

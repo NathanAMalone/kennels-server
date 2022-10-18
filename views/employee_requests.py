@@ -1,7 +1,7 @@
 from importlib import import_module
 import json
 import sqlite3
-from models import Employee, Location
+from models import Employee, Location, AnimalInEmployee
 
 EMPLOYEES = [
     {
@@ -74,21 +74,46 @@ def get_single_employee(id):
         # Use a ? parameter to inject a variable's value
         # into the SQL statement.
         db_cursor.execute("""
-        SELECT
+       SELECT
             e.id,
             e.name,
             e.address,
-            e.location_id
-        FROM employee e
+            e.location_id,
+            an.name animal_name,
+            d.name duty_name
+        FROM Employee e
+        JOIN Assignments a
+            ON a.employee_id = e.id
+        JOIN Duties d
+            ON d.id = a.duties_id
+        JOIN Animal an
+            ON an.id = a.animal_id
         WHERE e.id = ?
+        GROUP BY an.name
         """, ( id, ))
 
         # Load the single result into memory
-        data = db_cursor.fetchone()
+        dataset = db_cursor.fetchall()
 
+        assigned_animals = []
+        employee = None
+
+        for row in dataset:
+            
+            animal = AnimalInEmployee(row['animal_name'])
+
+            assigned_animals.append(animal.__dict__)
+
+        for row in dataset:
+
+            if employee is None:
         # Create an employee instance from the current row
-        employee = Employee(data['id'], data['name'], data['address'],
-                                data['location_id'])
+                employee = Employee(row['id'], row['name'], row['address'],
+                                row['location_id'])
+
+
+                employee.animal = assigned_animals
+                
 
         return employee.__dict__
 
