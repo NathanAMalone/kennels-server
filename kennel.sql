@@ -100,7 +100,7 @@ JOIN Location l
 	ON l.id = a.location_id
 JOIN Customer c
 	ON c.id = a.customer_id
-WHERE a.status = "Treatment"
+ORDER BY a.name
 
 SELECT 
 	l.id,
@@ -116,3 +116,4 @@ SELECT COUNT(location_id)
 FROM Animal
 WHERE location_id=1
 
+SELECT * FROM location

@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from models import Location
+from models import LocationWithCount
 
 LOCATIONS = [
     {
@@ -52,7 +52,7 @@ def get_all_locations():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Location class above.
-            location = Location(row['id'], row['name'], row['animals'], row['address'])
+            location = LocationWithCount(row['id'], row['name'], row['animals'], row['address'])
 
             locations.append(location.__dict__)
 
@@ -89,7 +89,7 @@ def get_single_location(id):
         data = db_cursor.fetchone()
 
         # Create an location instance from the current row
-        location = Location(data['id'], data['name'], data['animals'], data['address'])
+        location = LocationWithCount(data['id'], data['name'], data['animals'], data['address'])
 
         return location.__dict__
 

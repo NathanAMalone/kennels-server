@@ -58,6 +58,8 @@ def get_all_animals(query_params):
                     sort_by = "ORDER BY customer_id"
                 elif qs_value == 'status':
                     sort_by = "ORDER BY status"
+                elif qs_value == 'name':
+                    sort_by = "ORDER BY a.name"
         
             elif qs_key == "locationId":
                 where_clause = f"WHERE a.location_id = {qs_value}"
@@ -102,7 +104,7 @@ def get_all_animals(query_params):
                             row['location_id'], row['customer_id'])
 
             # Create a Location instance from the current row
-            location = Location(row['id'], row['location_name'], row['animals'], row['location_address'])
+            location = Location(row['id'], row['location_name'], row['location_address'])
 
             customer = Customer(row['id'], row['customer_name'], row['customer_address'],
                                 row['customer_email'])
