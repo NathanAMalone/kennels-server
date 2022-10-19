@@ -75,8 +75,10 @@ def get_all_animals(query_params):
             a.status,
             a.location_id,
             a.customer_id,
+            l.id location_id,
             l.name location_name,
             l.address location_address,
+            c.id customer_id,
             c.name customer_name,
             c.address customer_address,
             c.email customer_email
@@ -104,9 +106,9 @@ def get_all_animals(query_params):
                             row['location_id'], row['customer_id'])
 
             # Create a Location instance from the current row
-            location = Location(row['id'], row['location_name'], row['location_address'])
+            location = Location(row['location_id'], row['location_name'], row['location_address'])
 
-            customer = Customer(row['id'], row['customer_name'], row['customer_address'],
+            customer = Customer(row['customer_id'], row['customer_name'], row['customer_address'],
                                 row['customer_email'])
 
             # Add the dictionary representation of the location to the animal

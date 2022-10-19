@@ -28,6 +28,7 @@ def get_all_employees():
             e.name,
             e.address,
             e.location_id,
+            l.id location_id,
             l.name location_name,
             l.address location_address
         FROM Employee e
@@ -51,7 +52,7 @@ def get_all_employees():
             employee = Employee(row['id'], row['name'], row['address'],
                                 row['location_id'])
 
-            location = Location(row['id'], row['location_name'], row['address'])
+            location = Location(row['location_id'], row['location_name'], row['address'])
 
             employee.location = location.__dict__
 
@@ -79,6 +80,7 @@ def get_single_employee(id):
             e.name,
             e.address,
             e.location_id,
+            an.id animal_id,
             an.name animal_name,
             d.name duty_name
         FROM Employee e
@@ -100,7 +102,7 @@ def get_single_employee(id):
 
         for row in dataset:
             
-            animal = AnimalInEmployee(row['animal_name'])
+            animal = AnimalInEmployee(row['animal_id'], row['animal_name'])
 
             assigned_animals.append(animal.__dict__)
 
